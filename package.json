@@ -1,0 +1,16 @@
+{
+  "name": "me.waker.ui.afearea",
+  "version": "0.1.1",
+  "description": "unity safe area for rect transform(ui) with scaler",
+  "displayName": "Waker Unity UI SafeArea",
+  "unity": "2021.3",
+  "author": {
+    "name": "waker",
+    "email": "wakeup50000@gmail.com",
+    "url": "https://github.com/wakeup5"
+  },
+  "keywords": [
+    "singleton"
+  ],
+  "relatedPackages": {}
+}
