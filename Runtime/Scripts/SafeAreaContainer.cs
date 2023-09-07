@@ -60,6 +60,12 @@ namespace Waker.UI
             max.x /= Screen.width;
             max.y /= Screen.height;
 
+            // NaN check
+            if (float.IsNaN(min.x) || float.IsNaN(min.y) || float.IsNaN(max.x) || float.IsNaN(max.y))
+            {
+                return;
+            }
+
             // Min
             var anchorMin = rectTransform.anchorMin;
             var offsetMin = rectTransform.offsetMin;
