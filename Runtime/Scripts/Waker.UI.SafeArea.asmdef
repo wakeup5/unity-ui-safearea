@@ -1,6 +1,6 @@
 {
     "name": "Waker.UI.SafeArea",
-    "rootNamespace": "",
+    "rootNamespace": "Waker.UI.SafeArea",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
