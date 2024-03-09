@@ -1,5 +1,4 @@
 using System;
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,7 +6,7 @@ namespace Waker.UI
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(RectTransform))]
-    public class SafeAreaContainer : UIBehaviour
+    public partial class SafeAreaContainer : UIBehaviour
     {
         [Flags]
         public enum Edge
@@ -29,29 +28,34 @@ namespace Waker.UI
 
         protected override void Awake()
         {
-            base.Awake();
-
             rectTransform = transform as RectTransform;
             parentRectTransform = this.GetComponentInParent<RectTransform>();
-        }
-
-        private void LateUpdate()
-        {
-#if UNITY_EDITOR
-            ApplySafeArea();
-#else
-            if (lastSafeArea != Screen.safeArea)
-            {
-                ApplySafeArea();
-            }
+            
+#if !UNITY_EDITOR
+            Manager.RegisterSafeAreaContainer(this);
 #endif
         }
 
-        private void ApplySafeArea()
+        protected override void OnDestroy()
         {
-            Rect safeArea = Screen.safeArea;
-            lastSafeArea = safeArea;
+#if !UNITY_EDITOR
+            Manager.UnregisterSafeAreaContainer(this);
+#endif
+        }
 
+#if UNITY_EDITOR
+        private void Update()
+        {
+            // Only in editor
+            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                ApplySafeArea(Screen.safeArea);
+            }
+        }
+#endif
+
+        public void ApplySafeArea(Rect safeArea)
+        {
             var min = safeArea.position;
             var max = min + safeArea.size;
 
