@@ -32,15 +32,17 @@ namespace Waker.UI
             parentRectTransform = this.GetComponentInParent<RectTransform>();
             
 #if !UNITY_EDITOR
-            Manager.RegisterSafeAreaContainer(this);
+            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
 #endif
+                Manager.RegisterSafeAreaContainer(this);
         }
 
         protected override void OnDestroy()
         {
-#if !UNITY_EDITOR
-            Manager.UnregisterSafeAreaContainer(this);
+#if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
 #endif
+                Manager.UnregisterSafeAreaContainer(this);
         }
 
 #if UNITY_EDITOR
