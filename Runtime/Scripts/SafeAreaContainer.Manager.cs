@@ -30,6 +30,7 @@ namespace Waker.UI
                 }
 
                 instance.containers.Add(container);
+                container.ApplySafeArea(Screen.safeArea);
             }
 
             public static void UnregisterSafeAreaContainer(SafeAreaContainer container)
