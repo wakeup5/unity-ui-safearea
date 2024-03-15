@@ -20,8 +20,6 @@ namespace Waker.UI
         [SerializeField] private Edge edge = Edge.Top | Edge.Bottom | Edge.Left | Edge.Right;
         [SerializeField] private bool lockOffset;
 
-        private Rect lastSafeArea;
-        private RectTransform parentRectTransform;
         private DrivenRectTransformTracker tracker = new DrivenRectTransformTracker();
 
         private RectTransform rectTransform;
@@ -29,9 +27,8 @@ namespace Waker.UI
         protected override void Awake()
         {
             rectTransform = transform as RectTransform;
-            parentRectTransform = this.GetComponentInParent<RectTransform>();
             
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
             if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
 #endif
                 Manager.RegisterSafeAreaContainer(this);

@@ -1,0 +1,16 @@
+{
+    "name": "Waker.UI.SafeArea.Editors",
+    "rootNamespace": "",
+    "references": [
+        "Waker.UI.SafeArea"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
