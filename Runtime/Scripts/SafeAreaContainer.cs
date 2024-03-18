@@ -27,19 +27,13 @@ namespace Waker.UI
         protected override void Awake()
         {
             rectTransform = transform as RectTransform;
-            
-#if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-#endif
-                Manager.RegisterSafeAreaContainer(this);
+         
+            Manager.RegisterSafeAreaContainer(this);
         }
 
         protected override void OnDestroy()
         {
-#if UNITY_EDITOR
-            if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-#endif
-                Manager.UnregisterSafeAreaContainer(this);
+            Manager.UnregisterSafeAreaContainer(this);
         }
 
 #if UNITY_EDITOR
