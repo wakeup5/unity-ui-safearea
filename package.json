@@ -1,6 +1,6 @@
 {
   "name": "me.waker.ui.safearea",
-  "version": "0.1.6",
+  "version": "0.2.6",
   "description": "unity safe area for rect transform(ui) with scaler",
   "displayName": "Waker Unity UI SafeArea",
   "unity": "2021.3",
