@@ -19,12 +19,7 @@ namespace Waker.UI
 
             public static void RegisterSafeAreaContainer(SafeAreaContainer container)
             {
-                if (container == null)
-                {
-                    return;
-                }
-
-                if (instance == null)
+                if (container == null || instance == null)
                 {
                     return;
                 }
@@ -35,12 +30,7 @@ namespace Waker.UI
 
             public static void UnregisterSafeAreaContainer(SafeAreaContainer container)
             {
-                if (container == null)
-                {
-                    return;
-                }
-
-                if (instance == null)
+                if (container == null || instance == null)
                 {
                     return;
                 }
@@ -53,10 +43,12 @@ namespace Waker.UI
 
             private void Update()
             {
+#if !UNITY_EDITOR
                 if (lastSafeArea == Screen.safeArea)
                 {
                     return;
                 }
+#endif
 
                 lastSafeArea = Screen.safeArea;
 

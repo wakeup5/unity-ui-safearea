@@ -20,6 +20,12 @@ namespace Waker.UI
         [SerializeField] private Edge edge = Edge.Top | Edge.Bottom | Edge.Left | Edge.Right;
         [SerializeField] private bool lockOffset;
 
+        [Header("Offset")]
+        [SerializeField] private float offsetTop;
+        [SerializeField] private float offsetBottom;
+        [SerializeField] private float offsetLeft;
+        [SerializeField] private float offsetRight;
+
         private DrivenRectTransformTracker tracker = new DrivenRectTransformTracker();
 
         private RectTransform rectTransform;
@@ -68,32 +74,28 @@ namespace Waker.UI
             var offsetMin = rectTransform.offsetMin;
 
             if (edge.HasFlag(Edge.Left))
-            {
                 anchorMin.x = min.x;
-                offsetMin.x = 0f;
-            }
+                
+            offsetMin.x = offsetLeft;
 
             if (edge.HasFlag(Edge.Bottom))
-            {
                 anchorMin.y = min.y;
-                offsetMin.y = 0f;
-            }
+
+            offsetMin.y = offsetBottom;
 
             var anchorMax = rectTransform.anchorMax;
             var offsetMax = rectTransform.offsetMax;
 
             // Max
             if (edge.HasFlag(Edge.Right))
-            {
                 anchorMax.x = max.x;
-                offsetMax.x = 0f;
-            }
+            
+            offsetMax.x = -offsetRight;
 
             if (edge.HasFlag(Edge.Top))
-            {
                 anchorMax.y = max.y;
-                offsetMax.y = 0f;
-            }
+
+            offsetMax.y = -offsetTop;
 
             rectTransform.anchorMin = anchorMin;
             rectTransform.anchorMax = anchorMax;
@@ -107,15 +109,44 @@ namespace Waker.UI
             rectTransform.localScale = Vector3.one;
 
             // Control transform
-            var properties = DrivenTransformProperties.AnchoredPositionZ | DrivenTransformProperties.Scale;
+            DrivenTransformProperties properties = DrivenTransformProperties.None;
 
-            if (edge.HasFlag(Edge.Top)) properties |= DrivenTransformProperties.AnchorMaxY;// | DrivenTransformProperties.AnchoredPositionY;
-            if (edge.HasFlag(Edge.Bottom)) properties |= DrivenTransformProperties.AnchorMinY;// | DrivenTransformProperties.ScaleY;
-            if (edge.HasFlag(Edge.Left)) properties |= DrivenTransformProperties.AnchorMinX;// | DrivenTransformProperties.AnchoredPositionX;
-            if (edge.HasFlag(Edge.Right)) properties |= DrivenTransformProperties.AnchorMaxX;// | DrivenTransformProperties.ScaleX;
+            properties |= DrivenTransformProperties.AnchoredPositionZ;
+            properties |= DrivenTransformProperties.Scale;
+
+            if (edge.HasFlag(Edge.Top)) 
+            {
+                properties |= DrivenTransformProperties.AnchorMaxY;
+
+                if (lockOffset)
+                    properties |= DrivenTransformProperties.AnchoredPositionY;
+            }
+            
+            if (edge.HasFlag(Edge.Bottom)) 
+            {
+                properties |= DrivenTransformProperties.AnchorMinY;
+
+                if (lockOffset)
+                    properties |= DrivenTransformProperties.SizeDeltaY;
+            }
+            
+            if (edge.HasFlag(Edge.Left)) 
+            {
+                properties |= DrivenTransformProperties.AnchorMinX;
+
+                if (lockOffset)
+                    properties |= DrivenTransformProperties.AnchoredPositionX;
+            }
+            
+            if (edge.HasFlag(Edge.Right)) 
+            {
+                properties |= DrivenTransformProperties.AnchorMaxX;
+
+                if (lockOffset)
+                    properties |= DrivenTransformProperties.SizeDeltaX;
+            }
 
             tracker.Clear();
-
             tracker.Add(this, rectTransform, properties);
         }
     }
