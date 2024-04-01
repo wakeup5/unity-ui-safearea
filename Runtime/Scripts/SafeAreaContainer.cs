@@ -20,15 +20,37 @@ namespace Waker.UI
         [SerializeField] private Edge edge = Edge.Top | Edge.Bottom | Edge.Left | Edge.Right;
         [SerializeField] private bool lockOffset;
 
-        [Header("Offset")]
+        [Header("Top")]
+        [SerializeField] private bool enableTop;
+        [SerializeField] private float anchorTopInSafeArea = 1f;
         [SerializeField] private float offsetTop;
+
+        [Header("Bottom")]
+        [SerializeField] private bool enableBottom;
+        [SerializeField] private float anchorBottomInSafeArea = 0f;
         [SerializeField] private float offsetBottom;
+
+        [Header("Left")]
+        [SerializeField] private bool enableLeft;
+        [SerializeField] private float anchorLeftInSafeArea = 0f;
         [SerializeField] private float offsetLeft;
+
+        [Header("Right")]
+        [SerializeField] private bool enableRight;
+        [SerializeField] private float anchorRightInSafeArea = 1f;
         [SerializeField] private float offsetRight;
 
         private DrivenRectTransformTracker tracker = new DrivenRectTransformTracker();
 
         private RectTransform rectTransform;
+
+        private void ApplySafeAreaTop(Rect safeArea, Vector2 safeAreaAnchorMinMaxY, ref DrivenTransformProperties property)
+        {
+            var anchorMax = rectTransform.anchorMax;
+            var offsetMax = rectTransform.offsetMax;
+
+            
+        }
 
         protected override void Awake()
         {
@@ -55,6 +77,31 @@ namespace Waker.UI
 
         public void ApplySafeArea(Rect safeArea)
         {
+            // Clamp
+            anchorTopInSafeArea = Mathf.Clamp01(anchorTopInSafeArea);
+            anchorBottomInSafeArea = Mathf.Clamp01(anchorBottomInSafeArea);
+            anchorLeftInSafeArea = Mathf.Clamp01(anchorLeftInSafeArea);
+            anchorRightInSafeArea = Mathf.Clamp01(anchorRightInSafeArea);
+
+            // Apply
+            bool et = enableTop || edge.HasFlag(Edge.Top);
+            bool eb = enableBottom || edge.HasFlag(Edge.Bottom);
+            bool el = enableLeft || edge.HasFlag(Edge.Left);
+            bool er = enableRight || edge.HasFlag(Edge.Right);
+
+            float at = anchorTopInSafeArea;
+            float ab = anchorBottomInSafeArea;
+            float al = anchorLeftInSafeArea;
+            float ar = anchorRightInSafeArea;
+
+            if (lockOffset)
+            {
+                at = 1f;
+                ab = 0f;
+                al = 0f;
+                ar = 1f;
+            }
+
             var min = safeArea.position;
             var max = min + safeArea.size;
 
@@ -69,82 +116,61 @@ namespace Waker.UI
                 return;
             }
 
-            // Min
             var anchorMin = rectTransform.anchorMin;
-            var offsetMin = rectTransform.offsetMin;
-
-            if (edge.HasFlag(Edge.Left))
-                anchorMin.x = min.x;
-                
-            offsetMin.x = offsetLeft;
-
-            if (edge.HasFlag(Edge.Bottom))
-                anchorMin.y = min.y;
-
-            offsetMin.y = offsetBottom;
-
             var anchorMax = rectTransform.anchorMax;
+
+            var offsetMin = rectTransform.offsetMin;            
             var offsetMax = rectTransform.offsetMax;
 
-            // Max
-            if (edge.HasFlag(Edge.Right))
-                anchorMax.x = max.x;
-            
-            offsetMax.x = -offsetRight;
-
-            if (edge.HasFlag(Edge.Top))
-                anchorMax.y = max.y;
-
-            offsetMax.y = -offsetTop;
-
-            rectTransform.anchorMin = anchorMin;
-            rectTransform.anchorMax = anchorMax;
-
-            if (lockOffset)
-            {
-                rectTransform.offsetMin = offsetMin;
-                rectTransform.offsetMax = offsetMax;
-            }
-
-            rectTransform.localScale = Vector3.one;
-
-            // Control transform
+             // Control transform
             DrivenTransformProperties properties = DrivenTransformProperties.None;
 
             properties |= DrivenTransformProperties.AnchoredPositionZ;
             properties |= DrivenTransformProperties.Scale;
 
-            if (edge.HasFlag(Edge.Top)) 
+            offsetMax.y = -offsetTop;
+            if (et)
             {
+                anchorMax.y = Mathf.Lerp(min.y, max.y, at);
+
                 properties |= DrivenTransformProperties.AnchorMaxY;
-
-                if (lockOffset)
-                    properties |= DrivenTransformProperties.AnchoredPositionY;
+                properties |= DrivenTransformProperties.AnchoredPositionY;
             }
-            
-            if (edge.HasFlag(Edge.Bottom)) 
+
+            offsetMin.y = offsetBottom;
+            if (eb)
             {
+                anchorMin.y = Mathf.Lerp(min.y, max.y, ab);
+
                 properties |= DrivenTransformProperties.AnchorMinY;
-
-                if (lockOffset)
-                    properties |= DrivenTransformProperties.SizeDeltaY;
+                properties |= DrivenTransformProperties.SizeDeltaY;
             }
-            
-            if (edge.HasFlag(Edge.Left)) 
+
+            offsetMin.x = offsetLeft;
+            if (el)
             {
+                anchorMin.x = Mathf.Lerp(min.x, max.x, al);
+
                 properties |= DrivenTransformProperties.AnchorMinX;
-
-                if (lockOffset)
-                    properties |= DrivenTransformProperties.AnchoredPositionX;
+                properties |= DrivenTransformProperties.AnchoredPositionX;
             }
-            
-            if (edge.HasFlag(Edge.Right)) 
+
+            offsetMax.x = -offsetRight;
+            if (er)
             {
-                properties |= DrivenTransformProperties.AnchorMaxX;
+                anchorMax.x = Mathf.Lerp(min.x, max.x, ar);
 
-                if (lockOffset)
-                    properties |= DrivenTransformProperties.SizeDeltaX;
+                properties |= DrivenTransformProperties.AnchorMaxX;
+                properties |= DrivenTransformProperties.SizeDeltaX;
             }
+
+            rectTransform.anchorMin = anchorMin;
+            rectTransform.anchorMax = anchorMax;
+
+            rectTransform.offsetMin = offsetMin;
+            rectTransform.offsetMax = offsetMax;
+            
+            rectTransform.localScale = Vector3.one;
 
             tracker.Clear();
             tracker.Add(this, rectTransform, properties);
