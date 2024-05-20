@@ -32,8 +32,7 @@ The `SafeAreaRectTransform` component offers three modes to configure the safe a
 
 1. **Fully**: Automatically adjusts the `RectTransform` to fill the Safe Area. This mode ensures that the UI element fully respects the Safe Area boundaries.
 2. **Simple**: Allows enabling or disabling each edge individually. This mode provides basic customization by letting you specify which edges (top, bottom, left, right) should respect the Safe Area.
-3. **Advanced**: Provides more extensive options than Simple. This mode offers advanced customization, including additional padding and fine-tuning of the Safe Area adjustments for more complex layouts.
-
+3. **Advanced**: Provides more extensive options than Simple.
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
