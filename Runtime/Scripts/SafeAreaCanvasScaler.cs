@@ -6,9 +6,9 @@ namespace UnityEngine.UI
 {
     [RequireComponent(typeof(Canvas))]
     [ExecuteAlways]
-    [AddComponentMenu("Layout/Canvas Scaler With SafeArea", 101)]
+    [AddComponentMenu("Layout/Safe Area Canvas Scaler", 101)]
     [DisallowMultipleComponent]
-    public class CanvasScalerWithSafeArea : CanvasScaler
+    public class SafeAreaCanvasScaler : CanvasScaler
     {
         private Canvas canvas;
         private const float kLogBase = 2;

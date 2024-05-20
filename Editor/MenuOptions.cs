@@ -20,7 +20,7 @@ namespace Waker.UI
                 return;
             }
 
-            var obj = new GameObject("Safe Area Container", typeof(SafeAreaContainer));
+            var obj = new GameObject("Safe Area Container", typeof(SafeAreaRectTransform));
             obj.transform.SetParent(parent, false);
 
             Selection.activeGameObject = obj;
