@@ -10,7 +10,7 @@ To use this library in your Unity project, follow these steps:
 2. Go to `Window` -> `Package Manager` in the Unity Editor.
 3. Click the `+` button in the top left corner of the Package Manager window.
 4. Select `Add package from git URL...`.
-5. Enter the following URL: `https://github.com/your-repository-url.git` and click `Add`.
+5. Enter the following URL: ```https://github.com/wakeup5/unity-ui-safearea.git``` and click `Add`.
 
 ## Usage
 
