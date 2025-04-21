@@ -11,7 +11,7 @@ namespace Waker.UI
     {
         public enum Mode
         {
-            Fully,
+            Automation,
             Simple,
             Advanced,
         }
@@ -33,42 +33,42 @@ namespace Waker.UI
 
         [System.Serializable]
         public class Simple
-        {    
-            [field:SerializeField]
+        {
+            [field: SerializeField]
             public Vector2 OffsetMin { get; set; } = new Vector2(0f, 0f);
 
-            [field:SerializeField] 
+            [field: SerializeField]
             public Vector2 OffsetMax { get; set; } = new Vector2(0f, 0f);
 
-            [field:SerializeField] 
+            [field: SerializeField]
             public Edge Edge { get; set; } = Edge.Top | Edge.Bottom | Edge.Left | Edge.Right;
 
-            [field:SerializeField] 
+            [field: SerializeField]
             public Vector2 AnchorMin { get; set; } = new Vector2(0f, 0f);
 
-            [field:SerializeField] 
+            [field: SerializeField]
             public Vector2 AnchorMax { get; set; } = new Vector2(1f, 1f);
         }
 
         [System.Serializable]
         public class Advanced
         {
-            [field:SerializeField]
+            [field: SerializeField]
             public Vector2 OffsetMin { get; set; } = new Vector2(0f, 0f);
 
-            [field:SerializeField] 
+            [field: SerializeField]
             public Vector2 OffsetMax { get; set; } = new Vector2(0f, 0f);
 
-            [field:SerializeField]
+            [field: SerializeField]
             public EdgeAnchor Left { get; set; } = new EdgeAnchor(0f);
-            
-            [field:SerializeField]
+
+            [field: SerializeField]
             public EdgeAnchor Right { get; set; } = new EdgeAnchor(1f);
 
-            [field:SerializeField]
+            [field: SerializeField]
             public EdgeAnchor Top { get; set; } = new EdgeAnchor(1f);
 
-            [field:SerializeField]
+            [field: SerializeField]
             public EdgeAnchor Bottom { get; set; } = new EdgeAnchor(0f);
         }
 
@@ -77,7 +77,7 @@ namespace Waker.UI
         {
             public EdgeAnchor()
             {
-                
+
             }
 
             public EdgeAnchor(float anchor)
@@ -85,25 +85,26 @@ namespace Waker.UI
                 Anchor = anchor;
             }
 
-            [field:SerializeField]
+            [field: SerializeField]
             public float Anchor { get; set; } = 0f;
 
-            [field:SerializeField]
+            [field: SerializeField]
             public AnchorType Min { get; set; } = AnchorType.FullScreen;
 
-            [field:SerializeField]
+            [field: SerializeField]
             public AnchorType Max { get; set; } = AnchorType.FullScreen;
         }
 
-        [SerializeField] private Mode _mode = Mode.Fully;
+        [SerializeField] private Mode _mode = Mode.Simple;
         [SerializeField] private Simple _simple = new Simple();
         [SerializeField] private Advanced _advanced = new Advanced();
 
-        private DrivenRectTransformTracker tracker = new DrivenRectTransformTracker();
-
+        private Canvas _rootCanvas;
         private RectTransform rectTransform;
         private Rect safeArea;
 
+#if UNITY_EDITOR
+        private DrivenRectTransformTracker tracker = new DrivenRectTransformTracker();
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -111,7 +112,7 @@ namespace Waker.UI
             if (rectTransform == null)
                 rectTransform = transform as RectTransform;
 
-             // Control transform
+            // Control transform
             DrivenTransformProperties properties = DrivenTransformProperties.None;
 
             properties |= DrivenTransformProperties.AnchoredPositionX;
@@ -126,12 +127,26 @@ namespace Waker.UI
             tracker.Clear();
             tracker.Add(this, rectTransform, properties);
         }
+#endif
 
         protected override void Awake()
         {
             base.Awake();
 
             rectTransform = transform as RectTransform;
+
+            if (rectTransform == null)
+            {
+                Debug.LogError("SafeAreaRectTransform requires a RectTransform component.");
+                return;
+            }
+
+            _rootCanvas = GetRootCanvas();
+            if (_rootCanvas == null)
+            {
+                Debug.LogError("SafeAreaRectTransform requires a Canvas component in the hierarchy.");
+                return;
+            }
         }
 
         protected override void Start()
@@ -175,33 +190,35 @@ namespace Waker.UI
         {
             switch (_mode)
             {
-                case Mode.Fully:
-                    ApplySafeAreaFully();
+                case Mode.Automation:
+                    ApplySafeAreaAutomation();
                     break;
                 case Mode.Simple:
-                    ApplySafeAreaSimpleMode();
+                    ApplySafeAreaSimple();
                     break;
                 case Mode.Advanced:
-                    ApplySafeAreaAdvancedMode();
+                    ApplySafeAreaAdvanced();
                     break;
             }
         }
 
-        private void ApplySafeAreaFully()
+        private void ApplySafeAreaAutomation()
         {
             Vector2 safeAreaMin = new Vector2();
             Vector2 safeAreaMax = new Vector2();
 
             GetSafeAreaAnchor(safeArea, out safeAreaMin, out safeAreaMax);
 
-            rectTransform.anchorMin = safeAreaMin;
-            rectTransform.anchorMax = safeAreaMax;
+            // rectTransform.anchorMin = safeAreaMin;
+            // rectTransform.anchorMax = safeAreaMax;
 
-            rectTransform.offsetMin = new Vector2(0f, 0f);
-            rectTransform.offsetMax = new Vector2(0f, 0f);
+            // rectTransform.offsetMin = new Vector2(0f, 0f);
+            // rectTransform.offsetMax = new Vector2(0f, 0f);
+
+            SetAnchorAndOffset(safeAreaMin, safeAreaMax, Vector2.zero, Vector2.zero);
         }
 
-        private void ApplySafeAreaSimpleMode()
+        private void ApplySafeAreaSimple()
         {
             // Variables
             Vector2 offsetMin = _simple.OffsetMin;
@@ -234,14 +251,16 @@ namespace Waker.UI
             finalAnchorMax.x = Mathf.Lerp(minX, maxX, anchorMax.x);
             finalAnchorMax.y = Mathf.Lerp(minY, maxY, anchorMax.y);
 
-            rectTransform.anchorMin = finalAnchorMin;
-            rectTransform.anchorMax = finalAnchorMax;
+            // rectTransform.anchorMin = finalAnchorMin;
+            // rectTransform.anchorMax = finalAnchorMax;
 
-            rectTransform.offsetMin = offsetMin;
-            rectTransform.offsetMax = offsetMax;
+            // rectTransform.offsetMin = offsetMin;
+            // rectTransform.offsetMax = offsetMax;
+
+            SetAnchorAndOffset(finalAnchorMin, finalAnchorMax, offsetMin, offsetMax);
         }
 
-        private void ApplySafeAreaAdvancedMode()
+        private void ApplySafeAreaAdvanced()
         {
             Vector2 offsetMin = _advanced.OffsetMin;
             Vector2 offsetMax = _advanced.OffsetMax;
@@ -269,11 +288,30 @@ namespace Waker.UI
             finalAnchorMax.x = GetAnchor(_advanced.Right, fullScreenX, safeAreaX);
             finalAnchorMax.y = GetAnchor(_advanced.Top, fullScreenY, safeAreaY);
 
-            rectTransform.anchorMin = finalAnchorMin;
-            rectTransform.anchorMax = finalAnchorMax;
+            // rectTransform.anchorMin = finalAnchorMin;
+            // rectTransform.anchorMax = finalAnchorMax;
 
-            rectTransform.offsetMin = offsetMin;
-            rectTransform.offsetMax = offsetMax;
+            // rectTransform.offsetMin = offsetMin;
+            // rectTransform.offsetMax = offsetMax;
+
+            SetAnchorAndOffset(finalAnchorMin, finalAnchorMax, offsetMin, offsetMax);
+        }
+
+        private void SetAnchorAndOffset(Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
+        {
+            // rectTransform.anchorMin = anchorMin;
+            // rectTransform.anchorMax = anchorMax;
+
+            // rectTransform.offsetMin = offsetMin;
+            // rectTransform.offsetMax = offsetMax;
+
+            var canvasSize = GetCanvasSize();
+
+            Vector2 anchorMinSize = new Vector2(canvasSize.x * anchorMin.x, canvasSize.y * anchorMin.y);
+            Vector2 anchorMaxSize = new Vector2(canvasSize.x * anchorMax.x, canvasSize.y * anchorMax.y) - canvasSize;
+
+            rectTransform.offsetMin = offsetMin + anchorMinSize;
+            rectTransform.offsetMax = offsetMax + anchorMaxSize;
         }
 
         private float GetAnchor(EdgeAnchor edge, Vector2 fullscreen, Vector2 safeArea)
@@ -282,6 +320,27 @@ namespace Waker.UI
             float max = Choose(edge.Max == AnchorType.SafeArea, safeArea.y, fullscreen.y);
 
             return Mathf.Lerp(min, max, edge.Anchor);
+        }
+
+        private Canvas GetRootCanvas()
+        {
+            Canvas parentCanvas = rectTransform.GetComponentInParent<Canvas>();
+            if (parentCanvas == null)
+            {
+                return null;
+            }
+            
+            return parentCanvas.rootCanvas;
+        }
+
+        private Vector2 GetCanvasSize()
+        {
+            if (_rootCanvas != null)
+            {
+                return new Vector2(Screen.width, Screen.height);
+            }
+
+            return new Vector2(Screen.width, Screen.height);
         }
     }
 }
