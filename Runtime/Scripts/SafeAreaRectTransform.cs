@@ -305,6 +305,9 @@ namespace Waker.UI
             // rectTransform.offsetMin = offsetMin;
             // rectTransform.offsetMax = offsetMax;
 
+            rectTransform.anchorMin = new Vector2(0f, 0f);
+            rectTransform.anchorMax = new Vector2(1f, 1f);
+
             var canvasSize = GetCanvasSize();
 
             Vector2 anchorMinSize = new Vector2(canvasSize.x * anchorMin.x, canvasSize.y * anchorMin.y);
@@ -335,9 +338,15 @@ namespace Waker.UI
 
         private Vector2 GetCanvasSize()
         {
-            if (_rootCanvas != null)
+#if UNITY_EDITOR
+            Canvas canvas = GetRootCanvas();
+#else
+            Canvas canvas = _rootCanvas;
+#endif
+
+            if (canvas != null && canvas.TryGetComponent<RectTransform>(out var canvasRectTransform))
             {
-                return new Vector2(Screen.width, Screen.height);
+                return canvasRectTransform.rect.size;
             }
 
             return new Vector2(Screen.width, Screen.height);
