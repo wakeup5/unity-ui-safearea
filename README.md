@@ -30,7 +30,7 @@ To use this library in your Unity project, follow these steps:
 
 The `SafeAreaRectTransform` component offers three modes to configure the safe area:
 
-1. **Fully**: Automatically adjusts the `RectTransform` to fill the Safe Area. This mode ensures that the UI element fully respects the Safe Area boundaries.
+1. **Automation**: Automatically adjusts the `RectTransform` to fill the Safe Area. This mode ensures that the UI element fully respects the Safe Area boundaries.
 2. **Simple**: Allows enabling or disabling each edge individually. This mode provides basic customization by letting you specify which edges (top, bottom, left, right) should respect the Safe Area.
 3. **Advanced**: Provides more extensive options than Simple.
 ## License
