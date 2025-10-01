@@ -32,7 +32,7 @@ namespace Waker.UI
 
             switch (mode)
             {
-                case SafeAreaRectTransform.Mode.Fully:
+                case SafeAreaRectTransform.Mode.Automation:
                     EditorGUILayout.HelpBox("Safe Area RectTransform is fully enabled.", MessageType.Info);
                     break;
                 case SafeAreaRectTransform.Mode.Simple:
